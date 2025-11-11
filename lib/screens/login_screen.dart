@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/forgot_password_screen.dart';
 import 'package:flutter_application_1/screens/signup_screen.dart';
+import 'package:flutter_application_1/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,6 +29,12 @@ class _LoginScreenState extends State<LoginScreen> {
       // Handle login logic here
       print('CNIC: ${_cnicController.text}');
       print('Password: ${_passwordController.text}');
+      
+      // Navigate to home screen and remove all previous routes
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (Route<dynamic> route) => false,
+      );
     }
   }
 
