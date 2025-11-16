@@ -1,10 +1,81 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'registration_form_screen.dart';
-import 'check_status_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_application_1/screens/login_screen.dart';
+import 'package:flutter_application_1/screens/registration_form_screen.dart';
+import 'package:flutter_application_1/screens/check_status_screen.dart';
+import 'package:flutter_application_1/theme/app_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  Widget _buildModernActionCard({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+    int delay = 0,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 160,
+        height: 180,
+        decoration: AppTheme.modernCardDecoration(
+          borderRadius: 24,
+          hasShadow: true,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    color,
+                    color.withOpacity(0.7),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: Colors.white, size: 36),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: AppTheme.subheadingStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      )
+          .animate()
+          .fadeIn(duration: 600.ms, delay: delay.ms)
+          .scale(delay: delay.ms, duration: 600.ms, curve: Curves.elasticOut)
+          .shimmer(delay: (delay + 600).ms, duration: 1000.ms, color: Colors.white.withOpacity(0.3)),
+    );
+  }
 
   Widget _buildFooterIcon({
     required IconData icon,
@@ -12,25 +83,30 @@ class HomeScreen extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.blue : Colors.grey,
-              size: 24,
+              color: isSelected ? AppTheme.primaryColor : Colors.grey,
+              size: 26,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               label,
-              style: TextStyle(
-                color: isSelected ? Colors.blue : Colors.grey,
+              style: AppTheme.bodyStyle(
                 fontSize: 12,
+                color: isSelected ? AppTheme.primaryColor : Colors.grey,
+              ).copyWith(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -42,208 +118,243 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
+          // Background
           Image.asset(
             'assets/images/bg.png',
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Container(color: Colors.white),
           ),
-          Container(color: Colors.black.withOpacity(0.25)),
-          Column(
-        children: [
-          // Header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             decoration: BoxDecoration(
-              color: Colors.blue,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withOpacity(0.95),
+                  Colors.white.withOpacity(0.85),
+                ],
+              ),
             ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  Row(
+          ),
+          Column(
+            children: [
+              // Modern Header
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withOpacity(0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Profile Icon on the left
-                      const Row(
+                      Row(
                         children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Icon(Icons.person, color: Colors.blue),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [Colors.white, Colors.white.withOpacity(0.8)],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: user?.photoURL != null
+                                  ? Image.network(user!.photoURL!, fit: BoxFit.cover)
+                                  : Icon(Icons.person, color: AppTheme.primaryColor),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome',
+                                style: AppTheme.bodyStyle(
+                                  fontSize: 12,
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
+                              ),
+                              Text(
+                                user?.email?.split('@')[0] ?? 'User',
+                                style: AppTheme.subheadingStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    
-                      // Logout button on the right
-                      TextButton.icon(
-                        icon: const Icon(Icons.logout, color: Colors.white, size: 20),
-                        label: const Text(
-                          'Logout',
-                          style: TextStyle(color: Colors.white),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (context) => const LoginScreen()),
-                            (Route<dynamic> route) => false,
-                          );
-                        },
+                        child: IconButton(
+                          icon: const Icon(Icons.logout, color: Colors.white),
+                          onPressed: () {
+                            FirebaseAuth.instance.signOut();
+                            Navigator.of(context).pushAndRemoveUntil(
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                  return FadeTransition(opacity: animation, child: child);
+                                },
+                                transitionDuration: const Duration(milliseconds: 300),
+                              ),
+                              (Route<dynamic> route) => false,
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Main Content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Action Buttons
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 24,
-                    runSpacing: 16,
-                  children: [
-                    SizedBox(
-                      width: 140,
-                      height: 160,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                ),
+              )
+                  .animate()
+                  .fadeIn(duration: 600.ms)
+                  .slideY(begin: -0.3, end: 0, duration: 600.ms),
+              
+              // Main Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Quick Actions',
+                        style: AppTheme.headingStyle(fontSize: 28, color: Colors.black87),
+                      )
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 200.ms)
+                          .slideX(begin: -0.2, end: 0, duration: 600.ms, delay: 200.ms),
+                      
+                      const SizedBox(height: 24),
+                      
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 20,
+                        runSpacing: 20,
                         children: [
-                          InkWell(
-                            customBorder: const CircleBorder(),
+                          _buildModernActionCard(
+                            icon: Icons.app_registration,
+                            title: 'Registration\nForm',
+                            color: AppTheme.primaryColor,
                             onTap: () {
                               Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const RegistrationFormScreen(),
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation, secondaryAnimation) => const RegistrationFormScreen(),
+                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                    return SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  },
+                                  transitionDuration: const Duration(milliseconds: 300),
                                 ),
                               );
                             },
-                            child: CircleAvatar(
-                              radius: 44,
-                              backgroundColor: Colors.blue.shade50,
-                              child: const Icon(Icons.app_registration, color: Colors.blue, size: 32),
-                            ),
+                            delay: 300,
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Registration form',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 140,
-                      height: 160,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          InkWell(
-                            customBorder: const CircleBorder(),
+                          _buildModernActionCard(
+                            icon: Icons.check_circle,
+                            title: 'Check\nStatus',
+                            color: AppTheme.accentColor,
                             onTap: () {
                               Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const CheckStatusScreen(),
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation, secondaryAnimation) => const CheckStatusScreen(),
+                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                    return SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  },
+                                  transitionDuration: const Duration(milliseconds: 300),
                                 ),
                               );
                             },
-                            child: CircleAvatar(
-                              radius: 44,
-                              backgroundColor: Colors.green.shade50,
-                              child: const Icon(Icons.check_circle, color: Colors.green, size: 32),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Check status',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.green,
-                            ),
+                            delay: 500,
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Footer
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, -2),
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Navigation Icons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildFooterIcon(
-                      icon: Icons.home_rounded,
-                      label: 'Home',
-                      isSelected: true,
-                      onTap: () {
-                        // Handle home tap
-                      },
-                    ),
-                    _buildFooterIcon(
-                      icon: Icons.article_outlined,
-                      label: 'News',
-                      isSelected: false,
-                      onTap: () {
-                        // Handle news tap
-                      },
-                    ),
-                    _buildFooterIcon(
-                      icon: Icons.payment_rounded,
-                      label: 'Payments',
-                      isSelected: false,
-                      onTap: () {
-                        // Handle payments tap
-                      },
+              ),
+              
+              // Modern Footer
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, -5),
                     ),
                   ],
                 ),
-              ],
-            ),
+                child: SafeArea(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildFooterIcon(
+                        icon: Icons.home_rounded,
+                        label: 'Home',
+                        isSelected: _selectedIndex == 0,
+                        onTap: () => setState(() => _selectedIndex = 0),
+                      ),
+                      _buildFooterIcon(
+                        icon: Icons.article_outlined,
+                        label: 'News',
+                        isSelected: _selectedIndex == 1,
+                        onTap: () => setState(() => _selectedIndex = 1),
+                      ),
+                      _buildFooterIcon(
+                        icon: Icons.payment_rounded,
+                        label: 'Payments',
+                        isSelected: _selectedIndex == 2,
+                        onTap: () => setState(() => _selectedIndex = 2),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+                  .animate()
+                  .fadeIn(duration: 600.ms, delay: 700.ms)
+                  .slideY(begin: 0.3, end: 0, duration: 600.ms, delay: 700.ms),
+            ],
           ),
-          ],
-        ),
         ],
       ),
     );

@@ -45,6 +45,7 @@ class RegistrationService {
         'applicant': applicantData,
         'familyMembers': familyMembers,
         'imageUrl': imageUrl,
+        'status': 'pending', // Set initial status as pending
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
         'userId': userId,

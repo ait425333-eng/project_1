@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'theme/app_theme.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,14 +17,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My App',
+      title: 'IMAM',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+          seedColor: AppTheme.primaryColor,
           brightness: Brightness.light,
+          primary: AppTheme.primaryColor,
+          secondary: AppTheme.secondaryColor,
         ),
         useMaterial3: true,
+        textTheme: GoogleFonts.interTextTheme(),
+        fontFamily: GoogleFonts.inter().fontFamily,
         appBarTheme: const AppBarTheme(
           elevation: 0,
           centerTitle: true,

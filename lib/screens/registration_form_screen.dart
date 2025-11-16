@@ -185,6 +185,36 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
         'tribe': 'Khwajak/Parachamkani',
       };
 
+      // Check if there's a family member in the form that hasn't been added yet
+      // If the form has family member data, add it to the list before saving
+      if (_familyName.isNotEmpty && _familyDob != null) {
+        // Ensure gender is set based on relation
+        _updateFamilyGenderFromRelation();
+        _updateFamilyShare();
+        
+        // Check if this family member is already in the list
+        bool alreadyAdded = _familyMembers.any((member) =>
+            member['name'] == _familyName &&
+            member['dob'] == _familyDob);
+        
+        if (!alreadyAdded) {
+          _familyMembers.add({
+            'relation': _relation,
+            'name': _familyName,
+            'gender': _familyGender,
+            'dob': _familyDob,
+            'nic': _familyNic,
+            'married': _married,
+            'subtribe': _familySubtribe,
+            'share': _familySharePercent,
+            'province': 'KPK',
+            'district': 'Kurram',
+            'tehsil': 'Central',
+            'tribe': 'Khwajak/Parachamkani',
+          });
+        }
+      }
+
       // Prepare family members data (convert DateTime to ISO string)
       final familyMembersData = _familyMembers.map((member) {
         final memberData = Map<String, dynamic>.from(member);
